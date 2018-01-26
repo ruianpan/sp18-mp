@@ -1,19 +1,14 @@
-
+fname=raw_input("name of the mazefile :  ")
 import numpy as np
 print('preparing the maze')
-
-
-
-infile = open('mm.txt', 'r')
+infile = open(fname, 'r')
 height = 0
 for line in infile:
     width=len(line)
     height = height + 1
-    #print(width)
-#print(width)
-#print(height)
+
 Matrix = [[0 for x in range(width)] for y in range(height)]
-infile = open('mm.txt','r')
+infile = open(fname,'r')
 w=0
 h=0
 for line in infile:
@@ -29,9 +24,7 @@ for line in infile:
                 endh=h
         w+=1
     h+=1
-#for a in range(0,h):
-#    print(Matrix[a])
-print(np.matrix(Matrix))
+
 Visited = [[0 for x in range(width)] for y in range(height)]
 parent = [[0 for x in range(width)] for y in range(height)]
 #ch=sh
@@ -46,12 +39,10 @@ s.append(starth*width+startw)
 loop=0
 while len(s)!=0:
     loop+=1
-    #print(s)
     curr=s.pop()
     currh=curr/width
     currw=curr%width
-    print(currh)
-    print(currw)
+
     if curr==end:
         print('complete')
         break
@@ -84,14 +75,14 @@ while len(s)!=0:
         #right
         if currw < width-1:
             if Visited[currh][currw+1]==0 and Matrix[currh][currw+1] !='%':
-                print('right')
+                #print('right')
                 #Visited[currh][currw+1]=1
                 s.append( (currh) * width + currw+1 )
                 parent[currh][currw+1]=curr
 #print(parent[end/width][end%width])
 position=end
 while position != start:
-    Matrix [position/width][position%width]= '*'
+    Matrix [position/width][position%width]= '.'
     position=parent[position/width][position%width]
 a=''
 for h in range(height):
@@ -99,9 +90,3 @@ for h in range(height):
         a=a+Matrix[h][w]
     a=a+'\n'
 print(a)
-
-
-
-
-
-print('eol')
