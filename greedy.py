@@ -32,13 +32,14 @@ def isIllegal(point, matrix):
 
 def greedy(matrix, start, goal):
     '''
-    Find the path to the goal using Greedy Best-first Search Algorithm
+    Find the path from start to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
     https://en.wikipedia.org/wiki/Best-first_search#Greedy_BFS
+    Notice: GBFS is suboptimal algorithm, so the solution MAY NOT BE OPTIMAL!
     :param matrix: Search space, as a 2D list
     :param start: Start point, as a tuple
     :param goal: Goal point, as a tuple
-    :return:
+    :return: The path (if found) from start to goal, or None
     '''
     print(start, goal)
 
@@ -105,8 +106,10 @@ if __name__ == '__main__':
     # print(np.matrix(maze))
 
     path = greedy(maze, getPosition(maze, START), getPosition(maze, GOAL))
-    print(len(path))
-
-    drawPath(maze, path)
-    print(np.matrix([''.join(maze[i]) for i in range(len(maze))]))
+    if path:
+        drawPath(maze, path)
+        print(len(path))
+        print(np.matrix([''.join(maze[i]) for i in range(len(maze))]))
+    else:
+        print('No possible path!')
 
