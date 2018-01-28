@@ -35,15 +35,15 @@ def distance(currX, currY, targetX, targetY):
     return (abs(currX - targetX)**2 + abs(currY - targetY)**2)**0.5
 
 
-def findMin(list, f_value):
+def findMin(list, t_value):
     """
     Get the min f_value of a list
     """
     currMin = sys.maxsize
     result = 0
     for index in list:
-        if f_value[index] < currMin:
-            currMin = f_value[index]
+        if t_value[index] < currMin:
+            currMin = t_value[index]
             result = index
     return result
 
@@ -86,7 +86,7 @@ def findPath(maze):
 
     while len(list) != 0:
         #find current best
-        curr = findMin(list, f_value)
+        curr = findMin(list, t_value)
 
         list.remove(curr)
         currY = curr / width
@@ -111,11 +111,11 @@ def findPath(maze):
                     t_value[curr - 1] = f_value[curr - 1] + distance((curr - 1) % width, (curr - 1) / width, endX, endY)
                     parent_Position[curr - 1] = curr
 
-            print(1)
+            #print(1)
 
         #Right
         if currX + 1 < width and maze[currY][currX + 1] != '%':
-            print("***********************")
+            #print("***********************")
             if curr + 1 < size and visited[curr + 1] != 1:
                 if curr + 1 not in list:
                     list.append(curr + 1)
@@ -124,7 +124,7 @@ def findPath(maze):
                     f_value[curr + 1] = curr_val
                     t_value[curr + 1] = f_value[curr + 1] + distance((curr + 1) % width, (curr + 1) / width, endX, endY)
                     parent_Position[curr + 1] = curr
-            print(2)
+            #print(2)
         #Up
         if currY - 1 >= 0 and maze[currY - 1][currX] != '%':
             if visited[curr - width] != 1:
@@ -135,7 +135,7 @@ def findPath(maze):
                     f_value[curr - width] = curr_val
                     t_value[curr - width] = f_value[curr - width] + distance((curr - width) % width, (curr - width) / width, endX, endY)
                     parent_Position[curr - width] = curr
-            print(3)
+            #print(3)
 
         #Down
         if currY + 1 < height and maze[currY + 1][currX] != '%':
@@ -147,7 +147,7 @@ def findPath(maze):
                         f_value[curr + width] = curr_val
                         t_value[curr + width] = f_value[curr + width] + distance((curr + width) % width, (curr + width) / width, endX, endY)
                         parent_Position[curr + width] = curr
-            print(4)
+            #print(4)
 
     step_cost = 0
     #Generate solution path
@@ -176,13 +176,13 @@ def findPath(maze):
 #Initialize maze
 width = 0
 height = 0
-infile = open('maze.txt', 'r')
+infile = open('mm.txt', 'r')
 for line in infile:
     width = len(line)
     height = height + 1
 
 maze = [[0 for x in range(width)] for y in range(height)]
-infile = open('maze.txt', 'r')
+infile = open('mm.txt', 'r')
 w = 0
 h = 0
 for line in infile:
