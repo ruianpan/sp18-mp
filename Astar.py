@@ -32,7 +32,7 @@ def distance(currX, currY, targetX, targetY):
     """
     Get the distance between two positions
     """
-    return (abs(currX - targetX)**2 + abs(currY - targetY)**2)**0.5
+    return abs(currX - targetX) + abs(currY - targetY)
 
 
 def findMin(list, t_value):
@@ -111,11 +111,9 @@ def findPath(maze):
                     t_value[curr - 1] = f_value[curr - 1] + distance((curr - 1) % width, (curr - 1) / width, endX, endY)
                     parent_Position[curr - 1] = curr
 
-            #print(1)
 
         #Right
         if currX + 1 < width and maze[currY][currX + 1] != '%':
-            #print("***********************")
             if curr + 1 < size and visited[curr + 1] != 1:
                 if curr + 1 not in list:
                     list.append(curr + 1)
@@ -124,7 +122,7 @@ def findPath(maze):
                     f_value[curr + 1] = curr_val
                     t_value[curr + 1] = f_value[curr + 1] + distance((curr + 1) % width, (curr + 1) / width, endX, endY)
                     parent_Position[curr + 1] = curr
-            #print(2)
+
         #Up
         if currY - 1 >= 0 and maze[currY - 1][currX] != '%':
             if visited[curr - width] != 1:
@@ -135,7 +133,6 @@ def findPath(maze):
                     f_value[curr - width] = curr_val
                     t_value[curr - width] = f_value[curr - width] + distance((curr - width) % width, (curr - width) / width, endX, endY)
                     parent_Position[curr - width] = curr
-            #print(3)
 
         #Down
         if currY + 1 < height and maze[currY + 1][currX] != '%':
@@ -147,7 +144,7 @@ def findPath(maze):
                         f_value[curr + width] = curr_val
                         t_value[curr + width] = f_value[curr + width] + distance((curr + width) % width, (curr + width) / width, endX, endY)
                         parent_Position[curr + width] = curr
-            #print(4)
+
 
     step_cost = 0
     #Generate solution path
@@ -176,13 +173,13 @@ def findPath(maze):
 #Initialize maze
 width = 0
 height = 0
-infile = open('mm.txt', 'r')
+infile = open('open.txt', 'r')
 for line in infile:
     width = len(line)
     height = height + 1
 
 maze = [[0 for x in range(width)] for y in range(height)]
-infile = open('mm.txt', 'r')
+infile = open('open.txt', 'r')
 w = 0
 h = 0
 for line in infile:
