@@ -1,12 +1,11 @@
 '''
 MP1 Greedy Best-first Search, CS440 SP18
 '''
+from frontier import Frontier
+import numpy as np
+from utilities import readMaze, drawPathOnMaze, getPosition, START, GOAL
 
 __author__ = 'Zhengdai Hu'
-
-from heapq import heappush, heappop
-import numpy as np
-from utilities import prepareMaze, drawPath, getPosition, START, GOAL
 
 
 def distence(current, goal):
@@ -19,7 +18,7 @@ def distence(current, goal):
     return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
 
 
-def isIllegal(point, matrix):
+def is_illegal(point, matrix):
     '''
     Check if point is outside the matrix or is wall.
     :param point: point as a tuple
@@ -30,8 +29,18 @@ def isIllegal(point, matrix):
            matrix[point[0]][point[1]] == '%'
 
 
+def expand(node, matrix):
+    transitions = [[0, -1], [-1, 0], [0, 1], [1, 0]]
+    neighbors = []
+    for t in transitions:
+        neighbor = tuple(np.add(node, t))
+        if not is_illegal(neighbor, matrix):
+            neighbors.append(neighbor)
+    return neighbors
+
+
 def greedy(matrix, start, goal):
-    '''
+    """
     Find the path from start to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
     https://en.wikipedia.org/wiki/Best-first_search#Greedy_BFS
@@ -40,76 +49,75 @@ def greedy(matrix, start, goal):
     :param start: Start point, as a tuple
     :param goal: Goal point, as a tuple
     :return: The path (if found) from start to goal, or None
-    '''
-    print(start, goal)
+    """
+    print('Analytics: start node ' + str(start) +
+          ', goal node ' + str(goal))
 
     # The set of nodes already evaluated
-    closedSet = set()
+    visited = set()
+    partially_expanded = set()
 
     # The set of currently discovered nodes that are not evaluated yet.
     # Initially, only the start node is known.
-    # openQueue is implemented as a priority queue
-    openQueue = []
-    heappush(openQueue, (distence(start, goal), start))
+    # frontier is implemented as a priority queue
+    frontier = Frontier()
+    frontier.add(start, distence(start, goal))
 
     # For each node, which node it can most efficiently be reached from.
-    # If a node can be reached from many nodes, cameFrom will eventually contain the
+    # If a node can be reached from many nodes, came_from will eventually contain the
     # most efficient previous step.
-    cameFrom = {}
+    came_from = {}
 
-    transitions = [(0, -1), (-1, 0), (0, 1), (1, 0)]
-    while openQueue:
-        currentNode = openQueue[0]
-        currentDistance = currentNode[0]
-        current = currentNode[1]
+    while frontier:
+        current, current_distance = frontier.nearest
         if current == goal:
-            return reconstructPath(cameFrom, current)
+            print('Analytics: ' + str(len(partially_expanded)) + ' expanded nodes, ' +
+                  'among which ' + str(len(visited)) +
+                  ' are fully expanded (all successors evaluated)')
+            return reconstruct_path(came_from, current)
 
-        isInterrupted = False
-        for t in transitions:
-            neighbor = tuple(np.add(current, t))
-            if isIllegal(neighbor, matrix) or (neighbor in closedSet):
-                continue
+        partially_expanded.add(current)
+        is_interrupted = False
+        for neighbor in expand(current, matrix):
+            if neighbor not in visited:
+                neighbor_distance = distence(neighbor, goal)
+                if neighbor not in frontier:  # Discover a new node
+                    came_from[neighbor] = current
+                    frontier.add(neighbor, neighbor_distance)
+                    if current_distance > neighbor_distance:
+                        is_interrupted = True
+                        break
 
-            neighborDistance = distence(neighbor, goal)
-            if (neighborDistance, neighbor) not in openQueue:  # Discover a new node
-                cameFrom[neighbor] = current
-                heappush(openQueue, (neighborDistance, neighbor))
-                if currentDistance > neighborDistance:
-                    isInterrupted = True
-                    break
-
-        if not isInterrupted:
-            heappop(openQueue)
-            closedSet.add(current)
+        if not is_interrupted:
+            frontier.pop_nearest()
+            visited.add(current)
 
     return None
 
 
-def reconstructPath(cameFrom, current):
+def reconstruct_path(came_from, current):
     '''
     Reconstruct path from a map into a list
-    :param cameFrom: Dictionary recording the predecessor of each node in path
+    :param came_from: Dictionary recording the predecessor of each node in path
     :param current: Start position
     :return: A path consisting a list of connecting points
     '''
     totalPath = [current]
-    while current in cameFrom:
-        current = cameFrom[current]
+    while current in came_from:
+        current = came_from[current]
         totalPath.append(current)
 
     return totalPath
 
 
 if __name__ == '__main__':
-    maze = prepareMaze('bg.txt')
+    maze = readMaze('bg.txt')
     # print(np.matrix(maze))
 
     path = greedy(maze, getPosition(maze, START), getPosition(maze, GOAL))
     if path:
-        drawPath(maze, path)
-        print(len(path))
-        print(np.matrix([''.join(maze[i]) for i in range(len(maze))]))
+        drawPathOnMaze(maze, path)
+        print('Total path length: ' + str(len(path)))
+        print('\n'.join(''.join(maze[i]) for i in range(len(maze))))
     else:
         print('No possible path!')
-
