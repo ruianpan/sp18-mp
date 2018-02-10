@@ -3,19 +3,12 @@ MP1 Greedy Best-first Search, CS440 SP18
 '''
 from frontier import Frontier
 import numpy as np
-from utilities import read_maze, draw_path_on_maze, get_position, START, GOAL, print_maze, reconstruct_path
+
+from heuristic import manhattan_distance, euclidean_distance
+from utilities import read_maze, draw_path_on_maze, get_position, START, GOAL, node_count, draw_expanded_nodes, \
+    print_maze, reconstruct_path
 
 __author__ = 'Zhengdai Hu'
-
-
-def distance(current, goal):
-    '''
-    Calculate Manhattan heuristic_distance between current point and goal point
-    :param current: current point as a tuple
-    :param goal: goal point as a tuple
-    :return: heuristic_distance in Manhattan heuristic_distance
-    '''
-    return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
 
 
 def is_illegal(point, matrix):
@@ -39,12 +32,13 @@ def expand(node, matrix):
     return neighbors
 
 
-def greedy(matrix, start, goal):
+def a_star(matrix, start, goal, estimate=manhattan_distance):
     """
     Find the path from start to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
     https://en.wikipedia.org/wiki/Best-first_search#Greedy_BFS
     Notice: GBFS is suboptimal algorithm, so the solution MAY NOT BE OPTIMAL!
+    :param estimate: Heuristics used in a_star search
     :param matrix: Search space, as a 2D list
     :param start: Start point, as a tuple
     :param goal: Goal point, as a tuple
@@ -55,13 +49,21 @@ def greedy(matrix, start, goal):
 
     # The set of nodes already evaluated
     visited = set()
-    partially_expanded = set()
+
+    # For each node, the cost of getting from the start node to that node.
+    # The cost of going from start to start is zero.
+    g_score = {start: 0}
+
+    # For each node, the total cost of getting from the start node to the goal
+    # by passing by that node. That value is partly known, partly heuristic.
+    # For the first node, that value is completely heuristic.
+    f_score = {start: estimate(start, goal)}
 
     # The set of currently discovered nodes that are not evaluated yet.
     # Initially, only the start node is known.
     # frontier is implemented as a priority queue
     frontier = Frontier()
-    frontier.add(start, distance(start, goal))
+    frontier.add(start, f_score[start])
 
     # For each node, which node it can most efficiently be reached from.
     # If a node can be reached from many nodes, came_from will eventually contain the
@@ -69,37 +71,35 @@ def greedy(matrix, start, goal):
     came_from = {}
 
     while frontier:
-        current, current_distance = frontier.nearest
+        current, current_f_score = frontier.pop_nearest()
         if current == goal:
-            print('Analytics: ' + str(len(partially_expanded)) + ' expanded nodes, ' +
-                  'among which ' + str(len(visited)) +
-                  ' are fully expanded (all successors evaluated)')
+            print('Analytics: ' + str(len(visited)) + ' expanded nodes, out of ' +
+                  str(node_count(matrix)) + ' nodes')
+            # draw_expanded_nodes(matrix, visited)
             return reconstruct_path(came_from, current)
 
-        partially_expanded.add(current)
-        is_interrupted = False
+        visited.add(current)
         for neighbor in expand(current, matrix):
             if neighbor not in visited:
-                neighbor_distance = distance(neighbor, goal)
-                if neighbor not in frontier:  # Discover a new node
-                    came_from[neighbor] = current
-                    frontier.add(neighbor, neighbor_distance)
-                    if current_distance > neighbor_distance:
-                        is_interrupted = True
-                        break
+                g_through_current = g_score[current] + 1  # every neighbor has distance 1
 
-        if not is_interrupted:
-            frontier.pop_nearest()
-            visited.add(current)
+                if (neighbor not in frontier or
+                        g_through_current < g_score[neighbor]):
+                    # Discover a new node or a better path
+                    came_from[neighbor] = current
+                    g_score[neighbor] = g_through_current
+                    f_score[neighbor] = (g_score[neighbor] +
+                                         estimate(neighbor, goal))
+                    frontier.add(neighbor, f_score[neighbor])
 
     return None
 
 
 if __name__ == '__main__':
-    maze = read_maze('bg.txt')
+    maze = read_maze('om.txt')
     # print(np.matrix(maze))
 
-    path = greedy(maze, get_position(maze, START), get_position(maze, GOAL))
+    path = a_star(maze, get_position(maze, START), get_position(maze, GOAL))
     if path:
         draw_path_on_maze(maze, path)
         print('Total path length: ' + str(len(path)))
