@@ -50,9 +50,9 @@ def print_maze(maze):
 
 def get_position_with_symbol(maze, symbol):
     '''
-    Helper function for getting begin and goal positions
+    Helper function for getting start and goal positions
     :param maze: Current maze
-    :param symbol: Symbol that designates either begin('p') or goal('.') position
+    :param symbol: Symbol that designates either start('p') or goal('.') position
     :return: The requested position, in a tuple
     '''
     for row in range(len(maze)):

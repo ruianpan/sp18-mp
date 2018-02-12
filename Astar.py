@@ -5,7 +5,7 @@ import sys
 
 def findStart(maze):
     """
-    Find the begin position of the maze
+    Find the start position of the maze
     """
     start_Position = 0
     for i in range(0, len(maze)):

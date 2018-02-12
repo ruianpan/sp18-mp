@@ -62,7 +62,7 @@ def __find(parent, vertex):
     return parent[vertex]
 
 
-def build_mst(remaining, edge_maps):
+def __build_mst(remaining, edge_maps):
     edges = itertools.combinations(remaining, 2)
     sorted_edges = sorted(map(lambda e: (len(edge_maps[e[0]][e[1]]) - 1,) + e, edges))
     forests = {}
@@ -110,4 +110,4 @@ def mst_estimator(curr, goals, edges):
         if not i:
             remaining_goals.append(goal)
 
-    return build_mst(remaining_goals, edges) if num_remains else 0
+    return __build_mst(remaining_goals, edges) if num_remains else 0

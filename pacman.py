@@ -5,7 +5,7 @@ import numpy as np
 
 def findStart(maze):
     """
-    Find the begin position of the maze
+    Find the start position of the maze
     """
     start_Position = 0
     for i in range(0, len(maze)):
@@ -233,7 +233,7 @@ if __name__ == "__main__":
     height = len(maze)
     size = width * height
 
-    #Position of begin node
+    #Position of start node
     start_Position = findStart(maze)
     startX = start_Position % width
     startY = start_Position / width

@@ -11,16 +11,16 @@ from utilities import read_maze, draw_path_on_maze, get_position_with_symbol, ST
 
 def greedy(matrix, start, goal):
     """
-    Find the path from begin to the goal using Greedy Best-first Search Algorithm
+    Find the path from start to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
     https://en.wikipedia.org/wiki/Best-first_search#Greedy_BFS
     Notice: GBFS is suboptimal algorithm, so the solution MAY NOT BE OPTIMAL!
     :param matrix: Search space, as a 2D list
     :param start: Start point, as a tuple
     :param goal: Goal point, as a tuple
-    :return: The path (if found) from begin to goal, or None
+    :return: The path (if found) from start to goal, or None
     """
-    print('Analytics: begin node ' + str(start) +
+    print('Analytics: start node ' + str(start) +
           ', goal node ' + str(goal))
 
     # The set of nodes already evaluated
@@ -28,7 +28,7 @@ def greedy(matrix, start, goal):
     partially_expanded = set()
 
     # The set of currently discovered nodes that are not evaluated yet.
-    # Initially, only the begin node is known.
+    # Initially, only the start node is known.
     # frontier is implemented as a priority queue
     frontier = Frontier()
     frontier.add(start, manhattan_dist(start, goal))
