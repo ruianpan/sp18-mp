@@ -1,17 +1,18 @@
 """
 Solutions for multi-dots traversal
 """
-from copy import deepcopy
+__author__ = 'Zhengdai Hu'
 
 import itertools
-
-from astar_base import expand, a_star
+from astar_base import a_star
 from frontier import Frontier
-from heuristic import multidots_distance, MSTEstimator, estimate
-from utilities import read_maze, get_position, START, GOAL, draw_path_on_maze, print_maze, get_goals, node_count, \
+from heuristic import mst_estimator
+from utilities import read_maze, get_position_with_symbol, START, draw_path_on_maze, print_maze, get_goals, \
     reconstruct_path
 
-__author__ = 'Zhengdai Hu'
+
+def init_state(position, goals):
+    return position + tuple(0 for _ in goals)
 
 
 def expand_multidots(current, edges):
@@ -19,11 +20,7 @@ def expand_multidots(current, edges):
     return map(lambda x: x + current[2:], neighbors)
 
 
-def init_state(position, goals):
-    return position + tuple(0 for _ in goals)
-
-
-def add_visited(this_goal: tuple, goals_to_indices: dict, original):
+def mark_visited(this_goal: tuple, goals_to_indices: dict, original):
     """
 
     :param this_goal: a dot coordinates
@@ -35,7 +32,7 @@ def add_visited(this_goal: tuple, goals_to_indices: dict, original):
     return original[0:pos] + (1, ) + original[pos + 1:]
 
 
-def a_star_multidots(edges, start: tuple, goals: tuple, estimate=multidots_distance):
+def a_star_multidots(edges, start: tuple, goals: tuple, estimate=mst_estimator):
     """
     Find the path from begin to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
@@ -54,7 +51,7 @@ def a_star_multidots(edges, start: tuple, goals: tuple, estimate=multidots_dista
 
     start = init_state(start, goals)
     if start[0:2] in goals:
-        start = add_visited(start[0:2], goals_to_indices, start)
+        start = mark_visited(start[0:2], goals_to_indices, start)
 
     # The set of nodes already evaluated
     visited = set()
@@ -66,8 +63,8 @@ def a_star_multidots(edges, start: tuple, goals: tuple, estimate=multidots_dista
     # For each node, the total cost of getting from the begin node to the dots
     # by passing by that node. That value is partly known, partly heuristic.
     # For the first node, that value is completely heuristic.
-    # f_score = {begin: estimate(begin, dots_visited[begin], goals)}
-    f_score = {start: estimate(start, goals)}
+    # f_score = {begin: naive_estimator(begin, dots_visited[begin], goals)}
+    f_score = {start: estimate(start, goals, edges)}
 
     # The set of currently discovered nodes that are not evaluated yet.
     # Initially, only the begin node is known.
@@ -90,40 +87,28 @@ def a_star_multidots(edges, start: tuple, goals: tuple, estimate=multidots_dista
 
         visited.add(current)
         for neighbor in expand_multidots(current, edges):
-            is_dot = False
             if neighbor[0:2] in goals:
-                new_neighbor = add_visited(neighbor[0:2], goals_to_indices, neighbor)
-                if new_neighbor != neighbor:
-                    is_dot = True
-                    neighbor = new_neighbor
+                neighbor = mark_visited(neighbor[0:2], goals_to_indices, neighbor)
 
-            if neighbor in visited:  # revisit a node only if eating more dots, also more expensive
-                # if not has_more(current, neighbor, dots_visited):
-                #     continue
-                # neighbor = (neighbor[0], neighbor[1], neighbor[2] + 1)
+            if neighbor in visited:
                 continue
 
-            g_through_current = g_score[current] + len(edges[current[0:2]][neighbor[0:2]])
+            g_through_current = g_score[current] + len(edges[current[0:2]][neighbor[0:2]]) - 1
 
             if (neighbor not in frontier or
                     g_through_current < g_score[neighbor]):
                 # Discover a new node or a better path
-                # dots_visited[neighbor] = deepcopy(dots_visited[current])
-                # if neighbor[0:2] in goals:
-                #     dots_visited[neighbor].add(neighbor[0:2])
 
                 came_from[neighbor] = current
                 g_score[neighbor] = g_through_current
 
-                f_score[neighbor] = (g_score[neighbor] +
-                                     # estimate(neighbor, dots_visited[neighbor], goals))
-                                     estimate(neighbor, goals))
+                f_score[neighbor] = (g_score[neighbor] + estimate(neighbor, goals, edges))
                 frontier.add(neighbor, f_score[neighbor])
 
     return None
 
 
-def build_goals_graph(start, nodes: tuple, matrix):
+def build_goals_graph(start, nodes: tuple):
     nodes = nodes + (start, )
     edge_map = {node: {} for node in nodes}
     edges = itertools.combinations(nodes, 2)
@@ -131,10 +116,6 @@ def build_goals_graph(start, nodes: tuple, matrix):
         u = edge[0]
         v = edge[1]
         shortest_path = a_star(maze, u, v)
-        # maze_solution = deepcopy(matrix)
-        # draw_path_on_maze(maze_solution, shortest_path)
-        # print_maze(maze_solution)
-        # print(shortest_path)
         edge_map[v][u] = edge_map[u][v] = shortest_path
     return edge_map
 
@@ -154,26 +135,21 @@ def expand_path(compressed, details):
             expanded.extend(detail)
         expanded.pop()
     print(expanded)
-    print(len(expanded))
     return expanded
 
 
 if __name__ == '__main__':
-    maze = read_maze('mediumSearch.txt')
-    # print(np.matrix(maze))
+    maze = read_maze('smallSearch.txt')
 
-    begin = get_position(maze, START)
+    begin = get_position_with_symbol(maze, START)
     dots = get_goals(maze)
 
-    sub_paths = build_goals_graph(begin, dots, maze)
-    # print(dots)
-    path = a_star_multidots(sub_paths, begin, dots, estimate=estimate)
+    sub_paths = build_goals_graph(begin, dots)
+    path = a_star_multidots(sub_paths, begin, dots)
     full_path = expand_path(path, sub_paths)
-    path = full_path
-    if path:
-        print('\n'.join(map(str, path)))
-        draw_path_on_maze(maze, path)
-        print('Total path length: ' + str(len(path) - 1))
+    if full_path:
+        draw_path_on_maze(maze, full_path)
+        print('Total path length: ' + str(len(full_path)))
         print_maze(maze)
     else:
         print('No possible path!')

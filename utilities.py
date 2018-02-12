@@ -1,5 +1,13 @@
+"""
+Helper functions module
+"""
+__author__ = 'Zhengdai Hu'
+
+import numpy as np
+
 START = 'P'
 GOAL = '.'
+WALL = '%'
 
 
 def read_maze(filename):  # take the file name as input and return the maze matrix
@@ -32,7 +40,7 @@ def draw_path_on_maze(matrix, path):
     :param path: A path consisting a list of connecting points
     '''
     for point in path:
-        if matrix[point[0]][point[1]] != 'P' and matrix[point[0]][point[1]] != '.':
+        if matrix[point[0]][point[1]] != START and matrix[point[0]][point[1]] != GOAL:
             matrix[point[0]][point[1]] = '+'
 
 
@@ -40,12 +48,7 @@ def print_maze(maze):
     print('\n'.join(' '.join(maze[i]) for i in range(len(maze))))
 
 
-def draw_expanded_nodes(matrix, nodes):
-    for node in nodes:
-        matrix[node[0]][node[1]] = '+'
-
-
-def get_position(maze, symbol):
+def get_position_with_symbol(maze, symbol):
     '''
     Helper function for getting begin and goal positions
     :param maze: Current maze
@@ -68,8 +71,34 @@ def get_goals(maze):
     return tuple(goals)
 
 
-def node_count(maze):
+def count_nodes(maze):
     from functools import reduce
-    return sum(
-        [reduce(lambda x, y: x + 1 if y == ' ' else x, row, 0) for row in maze]
-    )
+    return sum([reduce(lambda x, y: x + 1 if y == ' ' else x, row, 0) for row in maze])
+
+
+def is_illegal(point, matrix):
+    '''
+    Check if point is outside the matrix or is wall.
+    :param point: point as a tuple
+    :param matrix: current matrix
+    :return: if the point is outside the matrix or is wall
+    '''
+    return (not (0 <= point[0] < len(matrix) and 0 <= point[1] < len(matrix[0])) or
+            matrix[point[0]][point[1]] == WALL)
+
+
+__edge_map = {}  # Provided astar is only applied in the same graph
+
+
+def expand(node, matrix):
+    if node not in __edge_map:
+        transitions = [[0, -1], [-1, 0], [0, 1], [1, 0]]
+        neighbors = []
+        for t in transitions:
+            neighbor = tuple(np.add(node, t))
+            if not is_illegal(neighbor, matrix):
+                neighbors.append(neighbor)
+        neighbors = tuple(neighbors)
+        __edge_map[node] = neighbors
+
+    return __edge_map[node]

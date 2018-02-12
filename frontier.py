@@ -1,11 +1,10 @@
-'''
+"""
 A priority queue class optimized for searching frontier management
-'''
-from heapq import heappush, heappop
-
-import itertools
-
+"""
 __author__ = 'Zhengdai Hu'
+
+from heapq import heappush, heappop
+import itertools
 
 
 class Frontier:

@@ -1,42 +1,12 @@
-'''
+"""
 MP1 Greedy Best-first Search, CS440 SP18
-'''
-from frontier import Frontier
-import numpy as np
-
-from heuristic import manhattan_dist, euclidean_distance
-from utilities import read_maze, draw_path_on_maze, get_position, START, GOAL, node_count, draw_expanded_nodes, \
-    print_maze, reconstruct_path
-
+"""
 __author__ = 'Zhengdai Hu'
 
-
-def is_illegal(point, matrix):
-    '''
-    Check if point is outside the matrix or is wall.
-    :param point: point as a tuple
-    :param matrix: current matrix
-    :return: if the point is outside the matrix or is wall
-    '''
-    return not (0 <= point[0] < len(matrix) and 0 <= point[1] < len(matrix[0])) or \
-           matrix[point[0]][point[1]] == '%'
-
-
-__edge_map = {}
-
-
-def expand(node, matrix):
-    if node not in __edge_map:
-        transitions = [[0, -1], [-1, 0], [0, 1], [1, 0]]
-        neighbors = []
-        for t in transitions:
-            neighbor = tuple(np.add(node, t))
-            if not is_illegal(neighbor, matrix):
-                neighbors.append(neighbor)
-        neighbors=tuple(neighbors)
-        __edge_map[node] = neighbors
-
-    return __edge_map[node]
+from frontier import Frontier
+from heuristic import manhattan_dist
+from utilities import read_maze, draw_path_on_maze, get_position_with_symbol, START, GOAL, count_nodes, \
+    print_maze, reconstruct_path, expand
 
 
 def a_star(matrix, start, goal, estimate=manhattan_dist):
@@ -81,7 +51,7 @@ def a_star(matrix, start, goal, estimate=manhattan_dist):
         current, current_f_score = frontier.pop_nearest()
         if current == goal:
             print('Analytics: ' + str(len(visited)) + ' expanded nodes, out of ' +
-                  str(node_count(matrix)) + ' nodes')
+                  str(count_nodes(matrix)) + ' nodes')
             # draw_expanded_nodes(matrix, visited)
             return reconstruct_path(came_from, current)
 
@@ -103,10 +73,10 @@ def a_star(matrix, start, goal, estimate=manhattan_dist):
 
 
 if __name__ == '__main__':
-    maze = read_maze('om.txt')
+    maze = read_maze('bg.txt')
     # print(np.matrix(maze))
 
-    path = a_star(maze, get_position(maze, START), get_position(maze, GOAL))
+    path = a_star(maze, get_position_with_symbol(maze, START), get_position_with_symbol(maze, GOAL))
     if path:
         draw_path_on_maze(maze, path)
         print('Total path length: ' + str(len(path)))
