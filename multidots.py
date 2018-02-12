@@ -159,7 +159,7 @@ def expand_path(compressed, details):
 
 
 if __name__ == '__main__':
-    maze = read_maze('smallSearch.txt')
+    maze = read_maze('mediumSearch.txt')
     # print(np.matrix(maze))
 
     begin = get_position(maze, START)

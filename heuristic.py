@@ -55,14 +55,19 @@ def estimate(curr, goals):
     goals_reached = curr[2:]
     total = 0
     remains = 0
+    minimum_travel = None
     for i, goal in zip(goals_reached, goals):
         if not i:
-            total += manhattan_dist(curr_pos, goal)
+            dist = manhattan_dist(curr_pos, goal)
+            total += dist
+            if minimum_travel is None or minimum_travel > dist:
+                minimum_travel = dist
             remains += 1
+
     if remains == 0:
         return -len(goals_reached)
     else:
-        val = total / remains - (len(goals_reached) - remains)
+        val = total / 2.5 - (len(goals_reached) - remains)
         return val
 
 
@@ -114,3 +119,25 @@ class MSTEstimator:
             # mst.add(edge)
             total += edge[0]
         return total
+
+    def estimate(self, curr, goals):
+        """
+
+        :param curr: current state
+        :param goals: All goals positions in a tuple
+        :return:
+        """
+        curr_pos = curr[0:2]
+        goals_reached = curr[2:]
+        total = 0
+        remains = 0
+        for i, goal in zip(goals_reached, goals):
+            if not i:
+                total += manhattan_dist(curr_pos, goal)
+                remains += 1
+
+        if remains == 0:
+            return -len(goals_reached)
+        else:
+            val = total / remains - (len(goals_reached) - remains)
+            return val
