@@ -4,7 +4,7 @@ MP1 Greedy Best-first Search, CS440 SP18
 from frontier import Frontier
 import numpy as np
 
-from heuristic import manhattan_distance, euclidean_distance
+from heuristic import manhattan_dist, euclidean_distance
 from utilities import read_maze, draw_path_on_maze, get_position, START, GOAL, node_count, draw_expanded_nodes, \
     print_maze, reconstruct_path
 
@@ -22,17 +22,24 @@ def is_illegal(point, matrix):
            matrix[point[0]][point[1]] == '%'
 
 
+__edge_map = {}
+
+
 def expand(node, matrix):
-    transitions = [[0, -1], [-1, 0], [0, 1], [1, 0]]
-    neighbors = []
-    for t in transitions:
-        neighbor = tuple(np.add(node, t))
-        if not is_illegal(neighbor, matrix):
-            neighbors.append(neighbor)
-    return neighbors
+    if node not in __edge_map:
+        transitions = [[0, -1], [-1, 0], [0, 1], [1, 0]]
+        neighbors = []
+        for t in transitions:
+            neighbor = tuple(np.add(node, t))
+            if not is_illegal(neighbor, matrix):
+                neighbors.append(neighbor)
+        neighbors=tuple(neighbors)
+        __edge_map[node] = neighbors
+
+    return __edge_map[node]
 
 
-def a_star(matrix, start, goal, estimate=manhattan_distance):
+def a_star(matrix, start, goal, estimate=manhattan_dist):
     """
     Find the path from start to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:

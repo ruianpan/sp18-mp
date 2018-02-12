@@ -59,13 +59,13 @@ def get_position(maze, symbol):
 
 
 def get_goals(maze):
-    goals = set()
+    goals = []
     for row in range(len(maze)):
         for column in range(len(maze[0])):
             if maze[row][column] == '.':
-                goals.add((row, column))
+                goals.append((row, column))
 
-    return goals
+    return tuple(goals)
 
 
 def node_count(maze):
