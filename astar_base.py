@@ -41,7 +41,7 @@ def expand(node, matrix):
 
 def a_star(matrix, start, goal, estimate=manhattan_dist):
     """
-    Find the path from start to the goal using Greedy Best-first Search Algorithm
+    Find the path from begin to the goal using Greedy Best-first Search Algorithm
     The algorithm is implemented based on the description on Wikipedia:
     https://en.wikipedia.org/wiki/Best-first_search#Greedy_BFS
     Notice: GBFS is suboptimal algorithm, so the solution MAY NOT BE OPTIMAL!
@@ -49,25 +49,25 @@ def a_star(matrix, start, goal, estimate=manhattan_dist):
     :param matrix: Search space, as a 2D list
     :param start: Start point, as a tuple
     :param goal: Goal point, as a tuple
-    :return: The path (if found) from start to goal, or None
+    :return: The path (if found) from begin to goal, or None
     """
-    print('Analytics: start node ' + str(start) +
+    print('Analytics: begin node ' + str(start) +
           ', goal node ' + str(goal))
 
     # The set of nodes already evaluated
     visited = set()
 
-    # For each node, the cost of getting from the start node to that node.
-    # The cost of going from start to start is zero.
+    # For each node, the cost of getting from the begin node to that node.
+    # The cost of going from begin to begin is zero.
     g_score = {start: 0}
 
-    # For each node, the total cost of getting from the start node to the goal
+    # For each node, the total cost of getting from the begin node to the goal
     # by passing by that node. That value is partly known, partly heuristic.
     # For the first node, that value is completely heuristic.
     f_score = {start: estimate(start, goal)}
 
     # The set of currently discovered nodes that are not evaluated yet.
-    # Initially, only the start node is known.
+    # Initially, only the begin node is known.
     # frontier is implemented as a priority queue
     frontier = Frontier()
     frontier.add(start, f_score[start])

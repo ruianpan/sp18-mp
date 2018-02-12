@@ -47,9 +47,9 @@ def draw_expanded_nodes(matrix, nodes):
 
 def get_position(maze, symbol):
     '''
-    Helper function for getting start and goal positions
+    Helper function for getting begin and goal positions
     :param maze: Current maze
-    :param symbol: Symbol that designates either start('p') or goal('.') position
+    :param symbol: Symbol that designates either begin('p') or goal('.') position
     :return: The requested position, in a tuple
     '''
     for row in range(len(maze)):
