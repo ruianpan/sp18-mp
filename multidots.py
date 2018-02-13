@@ -6,7 +6,7 @@ __author__ = 'Zhengdai Hu'
 import itertools
 from astar_base import a_star
 from frontier import Frontier
-from heuristic import mst_estimator
+from heuristics import mst_estimator
 from utilities import read_maze, get_position_with_symbol, START, draw_path_on_maze, print_maze, get_goals, \
     reconstruct_path
 

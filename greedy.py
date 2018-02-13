@@ -4,9 +4,9 @@ MP1 Greedy Best-first Search, CS440 SP18
 __author__ = 'Zhengdai Hu'
 
 from frontier import Frontier
-from heuristic import manhattan_dist
+from heuristics import manhattan_dist
 from utilities import read_maze, draw_path_on_maze, get_position_with_symbol, START, GOAL, print_maze, reconstruct_path, \
-    expand
+    expand, count_nodes
 
 
 def greedy(matrix, start, goal):
@@ -41,8 +41,8 @@ def greedy(matrix, start, goal):
     while frontier:
         current, current_distance = frontier.nearest
         if current == goal:
-            print('Analytics: ' + str(len(partially_expanded)) + ' expanded nodes, ' +
-                  'among which ' + str(len(visited)) +
+            print('Analytics: ' + str(len(partially_expanded)) + ' expanded nodes out of ' +
+                  str(count_nodes(matrix)) + ' nodes , among which ' + str(len(visited)) +
                   ' are fully expanded (all successors evaluated)')
             return reconstruct_path(came_from, current)
 
@@ -66,7 +66,7 @@ def greedy(matrix, start, goal):
 
 
 if __name__ == '__main__':
-    maze = read_maze('bg.txt')
+    maze = read_maze('om.txt')
     # print(np.matrix(maze))
 
     path = greedy(maze, get_position_with_symbol(maze, START), get_position_with_symbol(maze, GOAL))

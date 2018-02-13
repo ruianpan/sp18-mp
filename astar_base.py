@@ -4,7 +4,7 @@ MP1 Greedy Best-first Search, CS440 SP18
 __author__ = 'Zhengdai Hu'
 
 from frontier import Frontier
-from heuristic import manhattan_dist
+from heuristics import manhattan_dist
 from utilities import read_maze, draw_path_on_maze, get_position_with_symbol, START, GOAL, count_nodes, \
     print_maze, reconstruct_path, expand
 

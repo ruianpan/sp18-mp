@@ -33,14 +33,20 @@ def reconstruct_path(came_from, current):
     return totalPath
 
 
+__order = '0123456789abcdefghijklmnopqr'
+
+
 def draw_path_on_maze(matrix, path):
     '''
     Draw out path on the matrix. Notice that this function MODIFIES THE ORIGINAL MATRIX!!!
     :param matrix: The matrix the path to be drawn on
     :param path: A path consisting a list of connecting points
     '''
-    for point in path:
-        if matrix[point[0]][point[1]] != START and matrix[point[0]][point[1]] != GOAL:
+    order = (char for char in __order)
+    for point in reversed(path):
+        if matrix[point[0]][point[1]] == GOAL:
+            matrix[point[0]][point[1]] = next(order)
+        elif matrix[point[0]][point[1]] != START:
             matrix[point[0]][point[1]] = '+'
 
 
